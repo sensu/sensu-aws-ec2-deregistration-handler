@@ -1,0 +1,37 @@
+language: go
+go:
+- 1.10.x
+install:
+- go get gopkg.in/alecthomas/gometalinter.v1
+- go get github.com/gordonklaus/ineffassign
+- go get github.com/jgautheron/goconst/cmd/goconst
+- go get github.com/kisielk/errcheck
+- go get github.com/golang/dep/cmd/dep
+- dep ensure
+script:
+- gometalinter.v1 --vendor --disable-all --enable=vet --enable=ineffassign
+  --enable=goconst --tests ./...
+- go test -v -race ./...
+
+before_script:
+- echo "REPO $TRAVIS_REPO_SLUG TAG ${TRAVIS_TAG}"
+
+deploy:
+  - #goreleaser
+    provider: script
+    script: curl -sL https://git.io/goreleaser | bash
+    skip_cleanup: true
+    on:
+      tags: true
+      condition: $TRAVIS_OS_NAME = linux
+
+after_deploy:
+  - git clone https://github.com/sensu/sensu-go-bonsai-asset.git bonsai
+  - bonsai/generate-sha512sum.sh
+  - bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG" tag="${TRAVIS_TAG}" filename="dist/$(cat dist/sha512_file)"
+  - mv dist builds
+  - tar -czf "$(basename "$TRAVIS_REPO_SLUG")_${TRAVIS_TAG}.tgz" .bonsai.yml builds/*.tar.gz builds/*_sha512-checksums.txt *.md
+  - bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG" tag="${TRAVIS_TAG}" filename="$(basename "$TRAVIS_REPO_SLUG")_${TRAVIS_TAG}.tgz"
+env:
+  global:
+  - secure: o4swUkmS3M2m7y/kQX/w+wXR87/VrkB93oSmDIGRaWY715fiwqF46I2U7F6A9yRRpcrLyRIYiqpgHTB9HF1WVE8uZilzpEcNj6/WPjTe61ak8/X2TqzfVZQQ3nA0zsZMM2hd4Utro5SQ+uxUvUVAQzz8m0YywDmNE29EB4oNXCzIQrNiRDZSilIy2lO/3sAtki69HarKd3phsDjE2ln5X2Cz1QtUe5GXYMbCbUGeUrV5iLhDYWDiNM45d2lfRjcpP2UzOjvrxKYRAePVLX3kcU9njWlRAGySdROUB13pU/IcllHHpfd/pxOoBE9FZsTUnEjERKzg1CTERUuMt9Mv/u/CqfNyAZUZIL98tkmQW2oMjsTnPbABfCFMslxdNhU1yz+mFHJRCdk0BFQM5hDy6x9OtRELxVsh5hxXqT9bMTfuhsdsBj7nI0u2IlcVz67ZHMYSo94K0zgevHkZLCPIBMzmkC/WyGD9GuQfJp/gFLvd0iXvhmH6Pji8RZycNPYh1wB37V8fzeMnKQKTFDW200HYxgfY+NsBAy33T+SIHr+RC/HAh7dynPqUv5x7w0sjGkmQpAGc63GtNwdsNCfK0a2ZE24yHAosJF0EFK7R1xclm9+3JipRlOllP5W47yIPYDh4jt4bHgj4rYvWmgjio8GaSXXQFQEsqh6tj53lFl4=
