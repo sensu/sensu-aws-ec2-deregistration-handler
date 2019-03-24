@@ -106,9 +106,10 @@
       "namespace": "default",
       "labels": null,
       "annotations": {
-        "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "",
-        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "",
-        "sensu.io/plugins/ec2deregistration/config/aws-region": "",
+        "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "AKIAJGN3SB4DRR2FYL4Q",
+        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "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",
+        "sensu.io/plugins/ec2deregistration/config/aws-region": "us-east-2",
+        "sensu.io/plugins/ec2deregistration/config/aws-instance-id": "i-04d6f56a07cdc356e",
         "sensu.io/plugins/ec2deregistration/config/aws-accounts": "account1, account2",
         "sensu.io/plugins/ec2deregistration/config/aws-allowed-instance-states": "running,stopping",
         "sensu.io/plugins/ec2deregistration/config/timeout": "60"

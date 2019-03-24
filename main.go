@@ -3,28 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/aws"
 	"github.com/sensu/sensu-enterprise-go-plugin/sensu"
 	"github.com/sensu/sensu-go/types"
 	"log"
 	"strings"
 )
 
-type Config struct {
-	sensu.HandlerConfig
-	AwsAccessKeyId        string
-	AwsSecretKey          string
-	AwsRegion             string
-	AwsAccounts           string
-	AllowedInstanceStates string
-	Timeout               uint64
-
-	// Computed from the input
-	AwsAccountsMap           map[string]bool
-	AllowedInstanceStatesMap map[string]bool
-}
-
 var (
-	config = Config{
+	config = aws.Config{
 		HandlerConfig: sensu.HandlerConfig{
 			Name:     "sensu-handler",
 			Short:    "Sensu Go handler",
@@ -51,6 +38,15 @@ var (
 			Default:   "",
 			Usage:     "The AWS secret key id to authenticate",
 			Value:     &config.AwsSecretKey,
+		},
+		{
+			Path:      "aws-instance-id",
+			Env:       "AWS_INSTANCE_ID",
+			Argument:  "aws-instance-id",
+			Shorthand: "i",
+			Default:   "",
+			Usage:     "The AWS instance ID",
+			Value:     &config.AwsInstanceId,
 		},
 		{
 			Path:      "aws-region",
@@ -104,21 +100,24 @@ func main() {
 	goHandler := sensu.NewGoHandler(&config.HandlerConfig, options, checkArgs, executeHandler)
 	err := goHandler.Execute()
 	if err != nil {
-		fmt.Printf("Error executing plugin: %s", err)
+		log.Printf("Error executing plugin: %s", err)
 	}
 }
 
 // checkArgs is invoked by the go handler to perform validation of the values. If an error is returned
 // the handler will not be executed.
 func checkArgs(_ *types.Event) error {
-	if len(config.AwsRegion) == 0 {
-		return fmt.Errorf("aws-region must contain a value")
-	}
 	if len(config.AwsAccessKeyId) == 0 {
 		return fmt.Errorf("aws-access-key-id must contain a value")
 	}
 	if len(config.AwsSecretKey) == 0 {
 		return fmt.Errorf("aws-secret-key must contain a value")
+	}
+	if len(config.AwsInstanceId) == 0 {
+		return fmt.Errorf("aws-instance-id must contain a value")
+	}
+	if len(config.AwsRegion) == 0 {
+		return fmt.Errorf("aws-region must contain a value")
 	}
 	if len(config.AwsAccounts) == 0 {
 		return fmt.Errorf("aws-accounts must contain at least one value")
@@ -158,6 +157,18 @@ func executeHandler(event *types.Event) error {
 	log.Printf("Config:\n%s\n", string(configJsonBytes))
 	jsonBytes, _ := json.MarshalIndent(event, "", "    ")
 	log.Printf("Event:\n%s\n", string(jsonBytes))
+
+	awsHandler, err := aws.NewHandler(&config)
+	if err != nil {
+		return fmt.Errorf("could not initialize handler: %s", err)
+	}
+
+	instanceState, getErr := awsHandler.GetInstanceState()
+	if getErr != nil {
+		return fmt.Errorf("could not get instance state: %s", getErr)
+	}
+
+	log.Printf("Instance state: %s", instanceState)
 
 	return nil
 }

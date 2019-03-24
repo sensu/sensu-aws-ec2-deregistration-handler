@@ -25,6 +25,10 @@
 #   unused-packages = true
 
 [[constraint]]
+  name = "github.com/aws/aws-sdk-go"
+  version = "1.18.0"
+
+[[constraint]]
   name = "github.com/sensu/sensu-enterprise-go-plugin"
   revision = "1df374587fec5b70b2ca4cea1e8bf66f05f0b1ed"
 
