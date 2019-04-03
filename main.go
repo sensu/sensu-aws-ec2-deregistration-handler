@@ -10,11 +10,15 @@ import (
 	"strings"
 )
 
+const (
+	keepAliveEventName = "keepalive"
+)
+
 var (
 	config = aws.Config{
 		HandlerConfig: sensu.HandlerConfig{
-			Name:     "sensu-handler",
-			Short:    "Sensu Go handler",
+			Name:     "sensu-aws-ec2-deregistration-handler",
+			Short:    "removes sensu clients that do not have an allowed ec2 instance state",
 			Timeout:  10,
 			Keyspace: "sensu.io/plugins/ec2deregistration/config",
 		},
@@ -157,6 +161,10 @@ func executeHandler(event *types.Event) error {
 	log.Printf("Config:\n%s\n", string(configJsonBytes))
 	jsonBytes, _ := json.MarshalIndent(event, "", "    ")
 	log.Printf("Event:\n%s\n", string(jsonBytes))
+
+	if event.Check.Name != keepAliveEventName {
+		return fmt.Errorf("received non-keepalive event, not checking ec2 instance state")
+	}
 
 	awsHandler, err := aws.NewHandler(&config)
 	if err != nil {
