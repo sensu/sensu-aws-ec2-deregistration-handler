@@ -90,3 +90,11 @@ func (awsHandler *Handler) GetInstanceState() (string, error) {
 
 	return *instanceStatuses[0].InstanceState.Name, nil
 }
+
+//func (awsHandler *Handler) AssumeRole() error {
+//
+//	credentials := sts.AssumeRoleInput{
+//		RoleArn: awsHandler.
+//	}
+//	return nil
+//}
