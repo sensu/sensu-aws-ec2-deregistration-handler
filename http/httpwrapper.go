@@ -29,7 +29,7 @@ func NewBasicAuthHttpWrapper(timeout uint64, proxy string, username string, pass
 		httpClient,
 		username,
 		password,
-		nil,
+		"",
 	}, nil
 }
 
@@ -41,8 +41,8 @@ func NewBearerTokenHttpWrapper(timeout uint64, proxy string, bearerToken string)
 
 	return &HttpWrapper{
 		httpClient,
-		nil,
-		nil,
+		"",
+		"",
 		bearerToken,
 	}, nil
 }

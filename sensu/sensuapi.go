@@ -5,6 +5,12 @@ import (
 	"github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/http"
 	"log"
 	gohttp "net/http"
+	"net/url"
+)
+
+const (
+	apiV2Path         = "api/core/v2/namespaces/default"
+	apiV2EntitiesPath = "entities"
 )
 
 type Config struct {
@@ -15,7 +21,7 @@ type Config struct {
 	bearerToken string
 }
 
-type SensuApi struct {
+type Api struct {
 	config      *Config
 	httpWrapper *http.HttpWrapper
 }
@@ -26,7 +32,7 @@ type sensuAuthResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-func New(config *Config) (*SensuApi, error) {
+func New(config *Config) (*Api, error) {
 	accessToken, err := authenticateSensu(config)
 	if err != nil {
 		return nil, err
@@ -37,7 +43,7 @@ func New(config *Config) (*SensuApi, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SensuApi{
+	return &Api{
 		config:      config,
 		httpWrapper: httpWrapper,
 	}, nil
@@ -67,17 +73,13 @@ func authenticateSensu(config *Config) (string, error) {
 	return authResponse.AccessToken, nil
 }
 
-func (api *SensuApi) DeleteSensuEntity(entityId string) error {
-	deleteUrl := fmt.Sprintf("%s/api/core/v2/namespaces/default/entitites/%s", api.config.Url, entityId)
+func (api *Api) DeleteSensuEntity(entityId string) (int, string, error) {
+	deleteUrl := fmt.Sprintf("%s/%s/%s/%s", api.config.Url, apiV2Path, apiV2EntitiesPath, url.PathEscape(entityId))
 	log.Printf("Sensu API URL: %s", deleteUrl)
 
 	statusCode, result, err := api.httpWrapper.ExecuteRequest(gohttp.MethodDelete, deleteUrl, nil, nil)
 	if err != nil {
-		return fmt.Errorf("error deleting Sensu entity: %s", err)
+		return 0, "", fmt.Errorf("error deleting Sensu entity: %s", err)
 	}
-	if statusCode != gohttp.StatusAccepted {
-		return fmt.Errorf("DeleteSensuEntity returned status %d: %s", statusCode, result)
-	}
-
-	return nil
+	return statusCode, result, nil
 }

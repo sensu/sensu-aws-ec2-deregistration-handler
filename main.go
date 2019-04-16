@@ -1,12 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/aws"
+	sensuapi "github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/sensu"
 	"github.com/sensu/sensu-enterprise-go-plugin/sensu"
 	"github.com/sensu/sensu-go/types"
 	"log"
+	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -15,7 +17,7 @@ const (
 )
 
 var (
-	config = aws.Config{
+	awsConfig = aws.Config{
 		HandlerConfig: sensu.HandlerConfig{
 			Name:     "sensu-aws-ec2-deregistration-handler",
 			Short:    "removes sensu clients that do not have an allowed ec2 instance state",
@@ -23,6 +25,8 @@ var (
 			Keyspace: "sensu.io/plugins/ec2deregistration/config",
 		},
 	}
+
+	sensuApiConfig = sensuapi.Config{}
 
 	options = []*sensu.HandlerConfigOption{
 		{
@@ -32,7 +36,7 @@ var (
 			Shorthand: "k",
 			Default:   "",
 			Usage:     "The AWS access key id to authenticate",
-			Value:     &config.AwsAccessKeyId,
+			Value:     &awsConfig.AwsAccessKeyId,
 		},
 		{
 			Path:      "aws-secret-key",
@@ -41,7 +45,7 @@ var (
 			Shorthand: "s",
 			Default:   "",
 			Usage:     "The AWS secret key id to authenticate",
-			Value:     &config.AwsSecretKey,
+			Value:     &awsConfig.AwsSecretKey,
 		},
 		{
 			Path:      "aws-instance-id",
@@ -50,7 +54,7 @@ var (
 			Shorthand: "i",
 			Default:   "",
 			Usage:     "The AWS instance ID",
-			Value:     &config.AwsInstanceId,
+			Value:     &awsConfig.AwsInstanceId,
 		},
 		{
 			Path:      "aws-region",
@@ -59,7 +63,7 @@ var (
 			Shorthand: "r",
 			Default:   "us-east-1",
 			Usage:     "The AWS region",
-			Value:     &config.AwsRegion,
+			Value:     &awsConfig.AwsRegion,
 		},
 		{
 			Path:      "aws-allowed-instance-states",
@@ -68,17 +72,17 @@ var (
 			Shorthand: "S",
 			Default:   "running",
 			Usage:     "The EC2 instance states allowed",
-			Value:     &config.AllowedInstanceStates,
+			Value:     &awsConfig.AllowedInstanceStates,
 		},
-		{
-			Path:      "aws-accounts",
-			Env:       "AWS_ACCOUNTS",
-			Argument:  "aws-accounts",
-			Shorthand: "a",
-			Default:   "",
-			Usage:     "The AWS accounts",
-			Value:     &config.AwsAccounts,
-		},
+		//{
+		//	Path:      "aws-accounts",
+		//	Env:       "AWS_ACCOUNTS",
+		//	Argument:  "aws-accounts",
+		//	Shorthand: "a",
+		//	Default:   "",
+		//	Usage:     "The AWS accounts",
+		//	Value:     &awsConfig.AwsAccounts,
+		//},
 		{
 			Path:      "timeout",
 			Env:       "TIMEOUT",
@@ -86,7 +90,34 @@ var (
 			Shorthand: "t",
 			Default:   uint64(10),
 			Usage:     "The plugin timeout",
-			Value:     &config.Timeout,
+			Value:     &awsConfig.Timeout,
+		},
+		{
+			Path:      "sensu-api-url",
+			Env:       "SENSU_API_URL",
+			Argument:  "sensu-api-url",
+			Shorthand: "U",
+			Default:   "http://localhost:8080",
+			Usage:     "The Sensu API URL",
+			Value:     &sensuApiConfig.Url,
+		},
+		{
+			Path:      "sensu-api-username",
+			Env:       "SENSU_API_USERNAME",
+			Argument:  "sensu-api-username",
+			Shorthand: "u",
+			Default:   "",
+			Usage:     "The Sensu API username",
+			Value:     &sensuApiConfig.Username,
+		},
+		{
+			Path:      "sensu-api-password",
+			Env:       "SENSU_API_PASSWORD",
+			Argument:  "sensu-api-password",
+			Shorthand: "p",
+			Default:   "",
+			Usage:     "The Sensu API password",
+			Value:     &sensuApiConfig.Password,
 		},
 	}
 
@@ -101,7 +132,7 @@ var (
 )
 
 func main() {
-	goHandler := sensu.NewGoHandler(&config.HandlerConfig, options, checkArgs, executeHandler)
+	goHandler := sensu.NewGoHandler(&awsConfig.HandlerConfig, options, checkArgs, executeHandler)
 	err := goHandler.Execute()
 	if err != nil {
 		log.Printf("Error executing plugin: %s", err)
@@ -111,42 +142,55 @@ func main() {
 // checkArgs is invoked by the go handler to perform validation of the values. If an error is returned
 // the handler will not be executed.
 func checkArgs(_ *types.Event) error {
-	if len(config.AwsAccessKeyId) == 0 {
+	if len(awsConfig.AwsAccessKeyId) == 0 {
 		return fmt.Errorf("aws-access-key-id must contain a value")
 	}
-	if len(config.AwsSecretKey) == 0 {
+	if len(awsConfig.AwsSecretKey) == 0 {
 		return fmt.Errorf("aws-secret-key must contain a value")
 	}
-	if len(config.AwsInstanceId) == 0 {
+	if len(awsConfig.AwsInstanceId) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
 	}
-	if len(config.AwsRegion) == 0 {
+	if len(awsConfig.AwsRegion) == 0 {
 		return fmt.Errorf("aws-region must contain a value")
 	}
-	if len(config.AwsAccounts) == 0 {
-		return fmt.Errorf("aws-accounts must contain at least one value")
-	}
-	if len(config.AllowedInstanceStates) == 0 {
+	//if len(awsConfig.AwsAccounts) == 0 {
+	//	return fmt.Errorf("aws-accounts must contain at least one value")
+	//}
+	if len(awsConfig.AllowedInstanceStates) == 0 {
 		return fmt.Errorf("allowed-instance-states must contain at least one value")
+	}
+	if len(sensuApiConfig.Url) == 0 {
+		return fmt.Errorf("sensu-api-url must contain a value")
+	}
+	_, err := url.Parse(sensuApiConfig.Url)
+	if err != nil {
+		return fmt.Errorf("invalid value for sensu-api-url: %s", err)
+	}
+	if len(sensuApiConfig.Username) == 0 {
+		return fmt.Errorf("sensu-api-username must contain a value")
+	}
+	if len(sensuApiConfig.Password) == 0 {
+		return fmt.Errorf("sensu-api-username must contain a value")
 	}
 
 	// parse the aws accounts
-	config.AwsAccountsMap = make(map[string]bool)
-	for _, account := range strings.Split(config.AwsAccounts, ",") {
-		trimmedAccount := strings.TrimSpace(account)
-		if len(trimmedAccount) > 0 {
-			config.AwsAccountsMap[trimmedAccount] = true
-		}
-	}
+	//awsConfig.AwsAccountsMap = make(map[string]bool)
+	//for _, account := range strings.Split(awsConfig.AwsAccounts, ",") {
+	//	trimmedAccount := strings.TrimSpace(account)
+	//	if len(trimmedAccount) > 0 {
+	//		awsConfig.AwsAccountsMap[trimmedAccount] = true
+	//	}
+	//}
 
 	// parse the instance states
-	config.AllowedInstanceStatesMap = make(map[string]bool)
-	for _, instanceState := range strings.Split(config.AllowedInstanceStates, ",") {
+	awsConfig.AllowedInstanceStatesMap = make(map[string]bool)
+	for _, instanceState := range strings.Split(awsConfig.AllowedInstanceStates, ",") {
 		trimmedInstanceState := strings.TrimSpace(instanceState)
 		if len(trimmedInstanceState) == 0 {
 			// Ignore this one
 		} else if validInstanceStates[trimmedInstanceState] {
-			config.AllowedInstanceStatesMap[trimmedInstanceState] = true
+			awsConfig.AllowedInstanceStatesMap[trimmedInstanceState] = true
 		} else {
 			return fmt.Errorf("invalid instance state: %s", trimmedInstanceState)
 		}
@@ -157,16 +201,11 @@ func checkArgs(_ *types.Event) error {
 
 // executeHandler is executed by the go handler and executes the handler business logic.
 func executeHandler(event *types.Event) error {
-	configJsonBytes, _ := json.MarshalIndent(config, "", "    ")
-	log.Printf("Config:\n%s\n", string(configJsonBytes))
-	jsonBytes, _ := json.MarshalIndent(event, "", "    ")
-	log.Printf("Event:\n%s\n", string(jsonBytes))
-
 	if event.Check.Name != keepAliveEventName {
 		return fmt.Errorf("received non-keepalive event, not checking ec2 instance state")
 	}
 
-	awsHandler, err := aws.NewHandler(&config)
+	awsHandler, err := aws.NewHandler(&awsConfig)
 	if err != nil {
 		return fmt.Errorf("could not initialize handler: %s", err)
 	}
@@ -178,5 +217,34 @@ func executeHandler(event *types.Event) error {
 
 	log.Printf("Instance state: %s", instanceState)
 
-	return nil
+	// Validate instance state
+	if _, ok := awsConfig.AllowedInstanceStatesMap[instanceState]; ok {
+		log.Printf("'%s' is a valid instance state, not deregistering '%s' entity from Sensu", instanceState, awsConfig.AwsInstanceId)
+		return nil
+	}
+	log.Printf("'%s' is not a valid instance state, deregistering '%s' entity from Sensu", instanceState, awsConfig.AwsInstanceId)
+
+	sensuApi, err := sensuapi.New(&sensuApiConfig)
+	if err != nil {
+		return fmt.Errorf("error creating sensu api: %s", err)
+	}
+
+	return handleSensuDeleteOutput(sensuApi.DeleteSensuEntity(awsConfig.AwsInstanceId))
+}
+
+func handleSensuDeleteOutput(statusCode int, result string, err error) error {
+	if err != nil {
+		return fmt.Errorf("error deleting sensu entity '%s': %s", awsConfig.AwsInstanceId, err)
+	}
+	if statusCode == http.StatusNoContent {
+		log.Printf("Deregistered Sensu Entity '%s'\n", awsConfig.AwsInstanceId)
+		return nil
+	}
+	if statusCode == http.StatusNotFound {
+		log.Printf("Sensu Entity '%s' did not exist, not deregistered\n", awsConfig.AwsInstanceId)
+		return nil
+	}
+
+	return fmt.Errorf("invalid status code when deregistering entity %s: %d. Returned content: %s", awsConfig.AwsInstanceId,
+		statusCode, result)
 }

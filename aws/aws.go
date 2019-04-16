@@ -16,11 +16,11 @@ var (
 
 type Config struct {
 	sensu.HandlerConfig
-	AwsAccessKeyId        string
-	AwsSecretKey          string
-	AwsRegion             string
-	AwsInstanceId         string
-	AwsAccounts           string
+	AwsAccessKeyId string
+	AwsSecretKey   string
+	AwsRegion      string
+	AwsInstanceId  string
+	//AwsAccounts           string
 	AllowedInstanceStates string
 	Timeout               uint64
 

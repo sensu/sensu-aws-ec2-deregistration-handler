@@ -102,17 +102,19 @@
     "output_metric_handlers": [],
     "env_vars": null,
     "metadata": {
-      "name": "check-nginx",
+      "name": "keepalive",
       "namespace": "default",
       "labels": null,
       "annotations": {
-        "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "AKIAJ63MIHQOZH6GGGQQ",
-        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "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",
+        "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "AAAAAAAAAAAAAAA",
+        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
         "sensu.io/plugins/ec2deregistration/config/aws-region": "us-east-2",
-        "sensu.io/plugins/ec2deregistration/config/aws-instance-id": "i-04d6f56a07cdc356e",
-        "sensu.io/plugins/ec2deregistration/config/aws-accounts": "arn:aws:iam::222859577329:role/cross-account-readonly",
-        "sensu.io/plugins/ec2deregistration/config/aws-allowed-instance-states": "running,stopping",
-        "sensu.io/plugins/ec2deregistration/config/timeout": "60"
+        "sensu.io/plugins/ec2deregistration/config/aws-instance-id": "i-ffffffffffff",
+        "sensu.io/plugins/ec2deregistration/config/aws-allowed-instance-states": "running,stopping,stopped",
+        "sensu.io/plugins/ec2deregistration/config/timeout": "60",
+        "sensu.io/plugins/ec2deregistration/config/sensu-api-url": "http://localhost:8080",
+        "sensu.io/plugins/ec2deregistration/config/sensu-api-username": "admin",
+        "sensu.io/plugins/ec2deregistration/config/sensu-api-password": "P@ssw0rd!"
       }
     }
   }
