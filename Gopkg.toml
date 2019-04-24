@@ -29,8 +29,12 @@
   version = "1.18.0"
 
 [[constraint]]
+  name = "github.com/sensu/sensu-plugins-go-library"
+  version = "0.1.0"
+
+[[constraint]]
   name = "github.com/sensu/sensu-enterprise-go-plugin"
-  revision = "1df374587fec5b70b2ca4cea1e8bf66f05f0b1ed"
+  revision = "789aa7aba620c8333f82e60b5c59fa7ad285ad74"
 
 [[constraint]]
   name = "github.com/sensu/sensu-go"

@@ -157,14 +157,11 @@
   revision = "2315d5715e36303a941d907f038da7f7c44c773b"
 
 [[projects]]
-  digest = "1:20ce8e750bac05dbc551c8d0af2ca07202498625d7cfa6178711baa3eedcdcc4"
+  digest = "1:cd3df05fa46d060cbdc572894ca6d55ac7d3eafc2515faa1f270e95961eefcce"
   name = "github.com/sensu/sensu-enterprise-go-plugin"
-  packages = [
-    "args",
-    "sensu",
-  ]
+  packages = ["args"]
   pruneopts = "UT"
-  revision = "1df374587fec5b70b2ca4cea1e8bf66f05f0b1ed"
+  revision = "789aa7aba620c8333f82e60b5c59fa7ad285ad74"
 
 [[projects]]
   digest = "1:dafb48fd4fb82b3e0a15b789da6da152180e9c28b1b8846058903eff5eadc01d"
@@ -177,6 +174,14 @@
   ]
   pruneopts = "UT"
   revision = "2daf9d442deec0afd2c6f53c183460e879a10646"
+
+[[projects]]
+  digest = "1:7349ffe202a704bc95d0e9857b419df8192607fd5fa5d3e46b8780896eaaf017"
+  name = "github.com/sensu/sensu-plugins-go-library"
+  packages = ["sensu"]
+  pruneopts = "UT"
+  revision = "2c1f2650249c254b8d7ad7b98588c30650220a02"
+  version = "0.1.0"
 
 [[projects]]
   digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"
@@ -317,8 +322,8 @@
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/ec2",
-    "github.com/sensu/sensu-enterprise-go-plugin/sensu",
     "github.com/sensu/sensu-go/types",
+    "github.com/sensu/sensu-plugins-go-library/sensu",
     "github.com/stretchr/testify/assert",
   ]
   solver-name = "gps-cdcl"
