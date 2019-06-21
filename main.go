@@ -63,7 +63,7 @@ var (
 			Env:       "AWS_INSTANCE_ID_LABEL",
 			Argument:  "aws-instance-id-label",
 			Shorthand: "l",
-			Default:   "",
+			Default:   "aws-instance-id",
 			Usage:     "The entity label containing the AWS instance ID",
 			Value:     &awsInstanceIdLabel,
 		},

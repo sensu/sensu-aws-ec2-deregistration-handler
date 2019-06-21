@@ -109,8 +109,9 @@
       "labels": null,
       "annotations": {
         "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "aaaaaa",
-        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "bbbbbb",
+        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "bbbbbbbbb",
         "sensu.io/plugins/ec2deregistration/config/aws-region": "us-east-2",
+        "sensu.io/plugins/ec2deregistration/config/aws-instance-id-label": "aws_instance_id",
         "sensu.io/plugins/ec2deregistration/config/aws-allowed-instance-states": "running,stopping,stopped",
         "sensu.io/plugins/ec2deregistration/config/timeout": "60",
         "sensu.io/plugins/ec2deregistration/config/sensu-api-url": "http://localhost:8080",
