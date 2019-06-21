@@ -221,7 +221,8 @@ func retrieveAwsInstanceId(event *types.Event) {
 			log.Printf("Using %s entity label as the AWS instance ID\n", awsInstanceIdLabel)
 			awsConfig.AwsInstanceId = event.Entity.Labels[awsInstanceIdLabel]
 		}
-	} else {
+	}
+	if len(awsConfig.AwsInstanceId) == 0 {
 		log.Println("Using entity name as the AWS instance ID")
 		awsConfig.AwsInstanceId = event.Entity.Name
 	}
