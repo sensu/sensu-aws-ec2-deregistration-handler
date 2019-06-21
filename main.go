@@ -18,7 +18,7 @@ const (
 
 var (
 	awsConfig = aws.Config{
-		HandlerConfig: sensu.HandlerConfig{
+		PluginConfig: sensu.PluginConfig{
 			Name:     "sensu-aws-ec2-deregistration-handler",
 			Short:    "removes sensu clients that do not have an allowed ec2 instance state",
 			Timeout:  10,
@@ -26,9 +26,11 @@ var (
 		},
 	}
 
+	awsInstanceIdLabel = ""
+
 	sensuApiConfig = sensuapi.Config{}
 
-	options = []*sensu.HandlerConfigOption{
+	options = []*sensu.PluginConfigOption{
 		{
 			Path:      "aws-access-key-id",
 			Env:       "AWS_ACCESS_KEY_ID",
@@ -55,6 +57,15 @@ var (
 			Default:   "",
 			Usage:     "The AWS instance ID",
 			Value:     &awsConfig.AwsInstanceId,
+		},
+		{
+			Path:      "aws-instance-id-label",
+			Env:       "AWS_INSTANCE_ID_LABEL",
+			Argument:  "aws-instance-id-label",
+			Shorthand: "l",
+			Default:   "",
+			Usage:     "The entity label containing the AWS instance ID",
+			Value:     &awsInstanceIdLabel,
 		},
 		{
 			Path:      "aws-region",
@@ -132,16 +143,15 @@ var (
 )
 
 func main() {
-	goHandler := sensu.NewGoHandler(&awsConfig.HandlerConfig, options, checkArgs, executeHandler)
-	err := goHandler.Execute()
-	if err != nil {
-		log.Printf("Error executing plugin: %s", err)
-	}
+	goHandler := sensu.NewGoHandler(&awsConfig.PluginConfig, options, checkArgs, executeHandler)
+	goHandler.Execute()
 }
 
 // checkArgs is invoked by the go handler to perform validation of the values. If an error is returned
 // the handler will not be executed.
-func checkArgs(_ *types.Event) error {
+func checkArgs(event *types.Event) error {
+	retrieveAwsInstanceId(event)
+
 	if len(awsConfig.AwsAccessKeyId) == 0 {
 		return fmt.Errorf("aws-access-key-id must contain a value")
 	}
@@ -197,6 +207,24 @@ func checkArgs(_ *types.Event) error {
 	}
 
 	return nil
+}
+
+// retrieveAwsInstanceId sets the AWS instance id using the entity label or entity name
+// if the actual instance id is not set on the command line.
+func retrieveAwsInstanceId(event *types.Event) {
+	if len(awsConfig.AwsInstanceId) > 0 {
+		return
+	}
+
+	if len(awsInstanceIdLabel) > 0 {
+		if len(event.Entity.Labels[awsInstanceIdLabel]) > 0 {
+			log.Printf("Using %s entity label as the AWS instance ID\n", awsInstanceIdLabel)
+			awsConfig.AwsInstanceId = event.Entity.Labels[awsInstanceIdLabel]
+		}
+	} else {
+		log.Println("Using entity name as the AWS instance ID")
+		awsConfig.AwsInstanceId = event.Entity.Name
+	}
 }
 
 // executeHandler is executed by the go handler and executes the handler business logic.

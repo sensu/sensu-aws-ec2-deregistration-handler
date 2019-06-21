@@ -15,7 +15,7 @@ var (
 )
 
 type Config struct {
-	sensu.HandlerConfig
+	sensu.PluginConfig
 	AwsAccessKeyId string
 	AwsSecretKey   string
 	AwsRegion      string

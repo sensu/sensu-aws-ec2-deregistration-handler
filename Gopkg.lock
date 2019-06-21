@@ -42,16 +42,25 @@
   version = "v1.19.11"
 
 [[projects]]
-  digest = "1:660af934d331e79d29317ffd5c76fceedaa1249167b1ee461d284c58d53291c6"
+  digest = "1:52c395c0928cc0bdc702c212704103fde073b78e090d2bf1f71d220bd2a6c7a5"
   name = "github.com/coreos/etcd"
   packages = [
     "auth/authpb",
     "etcdserver/etcdserverpb",
     "mvcc/mvccpb",
+    "version",
   ]
   pruneopts = "UT"
-  revision = "d57e8b8d97adfc4a6c224fe116714bf1a1f3beb9"
-  version = "v3.3.12"
+  revision = "98d308426819d892e149fe45f6fd542464cb1f9d"
+  version = "v3.3.13"
+
+[[projects]]
+  digest = "1:05ffeeed3f0f05520de0679f6aa3219ffee69cfd6d9fb6c194879d4c818ad670"
+  name = "github.com/coreos/go-semver"
+  packages = ["semver"]
+  pruneopts = "UT"
+  revision = "e214231b295a8ea9479f11b70b35d5acf3556d9b"
+  version = "v0.3.0"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -119,11 +128,35 @@
   revision = "c2b33e84"
 
 [[projects]]
-  digest = "1:1ed5ad32e321bd35d51e30dbbccab9d226ac290347838d03362b427459036a91"
+  digest = "1:f5a2051c55d05548d2d4fd23d244027b59fbd943217df8aa3b5e170ac2fd6e1b"
   name = "github.com/json-iterator/go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f7279a603edee96fe7764d3de9c6ff8cf9970994"
+  revision = "v1.1.6"
+
+[[projects]]
+  digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
+
+[[projects]]
+  digest = "1:33422d238f147d247752996a26574ac48dcf472976eda7f5134015f06bf16563"
+  name = "github.com/modern-go/concurrent"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94"
+  version = "1.0.3"
+
+[[projects]]
+  digest = "1:e32bdbdb7c377a07a9a46378290059822efdce5c8d96fe71940d87cb4f918855"
+  name = "github.com/modern-go/reflect2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
+  version = "1.0.1"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -157,14 +190,7 @@
   revision = "2315d5715e36303a941d907f038da7f7c44c773b"
 
 [[projects]]
-  digest = "1:cd3df05fa46d060cbdc572894ca6d55ac7d3eafc2515faa1f270e95961eefcce"
-  name = "github.com/sensu/sensu-enterprise-go-plugin"
-  packages = ["args"]
-  pruneopts = "UT"
-  revision = "789aa7aba620c8333f82e60b5c59fa7ad285ad74"
-
-[[projects]]
-  digest = "1:dafb48fd4fb82b3e0a15b789da6da152180e9c28b1b8846058903eff5eadc01d"
+  digest = "1:fc0476019952b9a2cd93bd4b3dfe6def3dfd04628d6137bf9489f848bd549fa8"
   name = "github.com/sensu/sensu-go"
   packages = [
     "api/core/v2",
@@ -173,15 +199,27 @@
     "util/strings",
   ]
   pruneopts = "UT"
-  revision = "2daf9d442deec0afd2c6f53c183460e879a10646"
+  revision = "c7551ba6f201e23027db767b30e633ec716f463b"
+  version = "5.10.0"
 
 [[projects]]
-  digest = "1:7349ffe202a704bc95d0e9857b419df8192607fd5fa5d3e46b8780896eaaf017"
+  digest = "1:bc435eeda0b496809209b16442d524bc1d0fd1a7b2843e369c75f0be7072f152"
   name = "github.com/sensu/sensu-plugins-go-library"
-  packages = ["sensu"]
+  packages = [
+    "args",
+    "sensu",
+  ]
   pruneopts = "UT"
-  revision = "2c1f2650249c254b8d7ad7b98588c30650220a02"
-  version = "0.1.0"
+  revision = "3ea0d273e45847a43108b9025fe0d65be86463a2"
+  version = "0.3.0"
+
+[[projects]]
+  digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
 
 [[projects]]
   digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"

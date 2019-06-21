@@ -59,7 +59,9 @@
     "metadata": {
       "name": "webserver01-sensu",
       "namespace": "default",
-      "labels": null,
+      "labels": {
+        "aws_instance_id": "i-04d6f56a07cdc356e"
+      },
       "annotations": {
       }
     }
@@ -106,10 +108,9 @@
       "namespace": "default",
       "labels": null,
       "annotations": {
-        "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "AAAAAAAAAAAAAAA",
-        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+        "sensu.io/plugins/ec2deregistration/config/aws-access-key-id": "aaaaaa",
+        "sensu.io/plugins/ec2deregistration/config/aws-secret-key": "bbbbbb",
         "sensu.io/plugins/ec2deregistration/config/aws-region": "us-east-2",
-        "sensu.io/plugins/ec2deregistration/config/aws-instance-id": "i-ffffffffffff",
         "sensu.io/plugins/ec2deregistration/config/aws-allowed-instance-states": "running,stopping,stopped",
         "sensu.io/plugins/ec2deregistration/config/timeout": "60",
         "sensu.io/plugins/ec2deregistration/config/sensu-api-url": "http://localhost:8080",
