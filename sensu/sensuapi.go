@@ -74,12 +74,15 @@ func authenticateSensu(config *Config) (string, error) {
 }
 
 func (api *Api) DeleteSensuEntity(entityId string) (int, string, error) {
+	log.Printf("Deleting Sensu entity %s\n", entityId)
+
 	deleteUrl := fmt.Sprintf("%s/%s/%s/%s", api.config.Url, apiV2Path, apiV2EntitiesPath, url.PathEscape(entityId))
-	log.Printf("Sensu API URL: %s", deleteUrl)
+	log.Printf("Sensu API URL: %s\n", deleteUrl)
 
 	statusCode, result, err := api.httpWrapper.ExecuteRequest(gohttp.MethodDelete, deleteUrl, nil, nil)
 	if err != nil {
 		return 0, "", fmt.Errorf("error deleting Sensu entity: %s", err)
 	}
+
 	return statusCode, result, nil
 }

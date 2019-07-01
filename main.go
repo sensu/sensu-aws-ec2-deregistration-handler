@@ -248,20 +248,25 @@ func executeHandler(event *types.Event) error {
 
 	// Validate instance state
 	if _, ok := awsConfig.AllowedInstanceStatesMap[instanceState]; ok {
-		log.Printf("'%s' is a valid instance state, not deregistering '%s' entity from Sensu", instanceState, awsConfig.AwsInstanceId)
+		log.Printf("'%s' is a valid instance state, not deregistering '%s' entity from Sensu for '%s' AWS instance", instanceState,
+			event.Entity.Name, awsConfig.AwsInstanceId)
 		return nil
 	}
-	log.Printf("'%s' is not a valid instance state, deregistering '%s' entity from Sensu", instanceState, awsConfig.AwsInstanceId)
+	log.Printf("'%s' is not a valid instance state, deregistering '%s' entity from Sensu for '%s' AWS instance", instanceState,
+		event.Entity.Name, awsConfig.AwsInstanceId)
 
+	// First authenticate against the Sensu API
 	sensuApi, err := sensuapi.New(&sensuApiConfig)
 	if err != nil {
 		return fmt.Errorf("error creating sensu api: %s", err)
 	}
 
-	return handleSensuDeleteOutput(sensuApi.DeleteSensuEntity(awsConfig.AwsInstanceId))
+	// Delete the Sensu entity
+	statusCode, result, err := sensuApi.DeleteSensuEntity(event.Entity.Name)
+	return handleSensuDeleteOutput(event.Entity.Name, statusCode, result, err)
 }
 
-func handleSensuDeleteOutput(statusCode int, result string, err error) error {
+func handleSensuDeleteOutput(entityName string, statusCode int, result string, err error) error {
 	if err != nil {
 		return fmt.Errorf("error deleting sensu entity '%s': %s", awsConfig.AwsInstanceId, err)
 	}
@@ -270,7 +275,7 @@ func handleSensuDeleteOutput(statusCode int, result string, err error) error {
 		return nil
 	}
 	if statusCode == http.StatusNotFound {
-		log.Printf("Sensu Entity '%s' did not exist, not deregistered\n", awsConfig.AwsInstanceId)
+		log.Printf("Sensu Entity '%s' does not exist, not deregistered\n", entityName)
 		return nil
 	}
 
