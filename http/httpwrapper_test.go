@@ -49,6 +49,7 @@ func TestMarshallError_ExecuteRequest(t *testing.T) {
 	statusCode, resultStr, err := httpWrapper.ExecuteRequest("POST", "https://www.google.com", math.Inf(1), nil)
 	assert.Equal(t, 0, statusCode)
 	assert.Equal(t, "", resultStr)
+	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "marshalling")
 }
 
@@ -60,6 +61,7 @@ func TestInvalidMethod_ExecuteRequest(t *testing.T) {
 	statusCode, resultStr, err := httpWrapper.ExecuteRequest(":GOOBLEGOOK", "https://www.google.com", nil, nil)
 	assert.Equal(t, 0, statusCode)
 	assert.Equal(t, "", resultStr)
+	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "building request")
 }
 
@@ -84,6 +86,7 @@ func TestNoResult_ExecuteRequest(t *testing.T) {
 		client,
 		"user",
 		"pwd",
+		"",
 	}
 
 	// Send in invalid HTTP method
@@ -117,6 +120,7 @@ func TestReaderError_ExecuteRequest(t *testing.T) {
 		client,
 		"user",
 		"pwd",
+		"",
 	}
 
 	// Send in invalid HTTP method
@@ -151,6 +155,7 @@ func TestWithResult_ExecuteRequest(t *testing.T) {
 		client,
 		"user",
 		"pwd",
+		"",
 	}
 
 	sampleInput := &sampleData{"input"}
@@ -190,6 +195,7 @@ func TestWithUnmarshallingResultError_ExecuteRequest(t *testing.T) {
 		client,
 		"user",
 		"pwd",
+		"",
 	}
 
 	type wrongType struct {
