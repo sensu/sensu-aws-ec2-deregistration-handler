@@ -111,7 +111,7 @@ func (httpWrapper *HttpWrapper) ExecuteRequest(method string, url string, body i
 	log.Println("HTTP response status code:", response.StatusCode)
 
 	resultJson := string(buf)
-	log.Print("HTTP response JSON:", resultJson)
+
 	if result != nil {
 		err = json.Unmarshal(buf, result)
 		if err != nil {

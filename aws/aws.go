@@ -69,7 +69,7 @@ func (awsHandler *Handler) initAws() error {
 
 func (awsHandler *Handler) GetInstanceState() (string, error) {
 	instanceId := awsHandler.config.AwsInstanceId
-	log.Printf("Retrieving instance state for %s\n", instanceId)
+	log.Printf("Retrieving AWS instance state for %s\n", instanceId)
 
 	request := &ec2.DescribeInstanceStatusInput{
 		InstanceIds:         []*string{aws.String(instanceId)},
@@ -79,7 +79,6 @@ func (awsHandler *Handler) GetInstanceState() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error getting instance state for %s: %s", instanceId, err)
 	}
-	log.Printf("DescribeInstanceStatus response: %s", response)
 
 	instanceStatuses := response.InstanceStatuses
 	if len(instanceStatuses) == 0 {
@@ -90,11 +89,3 @@ func (awsHandler *Handler) GetInstanceState() (string, error) {
 
 	return *instanceStatuses[0].InstanceState.Name, nil
 }
-
-//func (awsHandler *Handler) AssumeRole() error {
-//
-//	credentials := sts.AssumeRoleInput{
-//		RoleArn: awsHandler.
-//	}
-//	return nil
-//}

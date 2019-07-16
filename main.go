@@ -271,7 +271,7 @@ func handleSensuDeleteOutput(entityName string, statusCode int, result string, e
 		return fmt.Errorf("error deleting sensu entity '%s': %s", awsConfig.AwsInstanceId, err)
 	}
 	if statusCode == http.StatusNoContent {
-		log.Printf("Deregistered Sensu Entity '%s'\n", awsConfig.AwsInstanceId)
+		log.Printf("Deregistered Sensu Entity '%s'\n", entityName)
 		return nil
 	}
 	if statusCode == http.StatusNotFound {
