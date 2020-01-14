@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/aws"
-	sensuapi "github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/sensu"
+	"github.com/sensu/sensu-aws-ec2-deregistration-handler/aws"
+	sensuapi "github.com/sensu/sensu-aws-ec2-deregistration-handler/sensu"
 	"github.com/sensu/sensu-go/types"
 	"github.com/sensu/sensu-plugins-go-library/sensu"
 	"log"
