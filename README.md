@@ -60,7 +60,7 @@ export AWS_SECRET_KEY=secretkey
 export AWS_REGION=us-east-2
 export AWS_INSTANCE_ID_LABEL=aws-instance-id
 export AWS_ALLOWED_INSTANCE_STATES=running,stopped,stopping
-export SENSU_API_URL=http://localhost:8080export 
+export SENSU_API_URL=http://localhost:8080
 export SENSU_API_USERNAME=admin
 export SENSU_API_PASSWORD=password
 sensu-aws-ec2-deregistration-handler < event.json
