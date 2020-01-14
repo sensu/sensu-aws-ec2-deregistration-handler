@@ -1,6 +1,6 @@
 language: go
 go:
-- 1.10.x
+- 1.12.x
 install:
 - go get gopkg.in/alecthomas/gometalinter.v1
 - go get github.com/gordonklaus/ineffassign
@@ -25,13 +25,6 @@ deploy:
       tags: true
       condition: $TRAVIS_OS_NAME = linux
 
-after_deploy:
-  - git clone https://github.com/sensu/sensu-go-bonsai-asset.git bonsai
-  - bonsai/generate-sha512sum.sh
-  - bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG" tag="${TRAVIS_TAG}" filename="dist/$(cat dist/sha512_file)"
-  - mv dist builds
-  - tar -czf "$(basename "$TRAVIS_REPO_SLUG")_${TRAVIS_TAG}.tgz" .bonsai.yml builds/*.tar.gz builds/*_sha512-checksums.txt *.md
-  - bonsai/github-release-upload.sh github_api_token=$GITHUB_TOKEN repo_slug="$TRAVIS_REPO_SLUG" tag="${TRAVIS_TAG}" filename="$(basename "$TRAVIS_REPO_SLUG")_${TRAVIS_TAG}.tgz"
 env:
   global:
-  - secure: o4swUkmS3M2m7y/kQX/w+wXR87/VrkB93oSmDIGRaWY715fiwqF46I2U7F6A9yRRpcrLyRIYiqpgHTB9HF1WVE8uZilzpEcNj6/WPjTe61ak8/X2TqzfVZQQ3nA0zsZMM2hd4Utro5SQ+uxUvUVAQzz8m0YywDmNE29EB4oNXCzIQrNiRDZSilIy2lO/3sAtki69HarKd3phsDjE2ln5X2Cz1QtUe5GXYMbCbUGeUrV5iLhDYWDiNM45d2lfRjcpP2UzOjvrxKYRAePVLX3kcU9njWlRAGySdROUB13pU/IcllHHpfd/pxOoBE9FZsTUnEjERKzg1CTERUuMt9Mv/u/CqfNyAZUZIL98tkmQW2oMjsTnPbABfCFMslxdNhU1yz+mFHJRCdk0BFQM5hDy6x9OtRELxVsh5hxXqT9bMTfuhsdsBj7nI0u2IlcVz67ZHMYSo94K0zgevHkZLCPIBMzmkC/WyGD9GuQfJp/gFLvd0iXvhmH6Pji8RZycNPYh1wB37V8fzeMnKQKTFDW200HYxgfY+NsBAy33T+SIHr+RC/HAh7dynPqUv5x7w0sjGkmQpAGc63GtNwdsNCfK0a2ZE24yHAosJF0EFK7R1xclm9+3JipRlOllP5W47yIPYDh4jt4bHgj4rYvWmgjio8GaSXXQFQEsqh6tj53lFl4=
+    - secure: Xij0BXWFuQOcT+dNabel3SqZU5HXU9LQ6ZpT13vxziwLPhGivdKvWvv2ze1Jqe5wHwl0pKgXuTGuEnQSntM/vxwwQI6nOsjYCYmpNiQr7lXMhewAM1N4T2BhUlIy0WJVgrMn1V5LGZHY80+OXKoDFWAjbJs6jsq9tYbwOBHxM8+7pgkJeVXmLOD9VBhvjWJmoY/dVVpTiQ22X7veAXXGobVoLOpw2dNlXe3H93kNQ7KJu5C7wq7m9WpIDLn0PlyxD6dixT6KY0PKgoYqvBpv0pMionDLPBRFXZ6y+3AttX9QGz3j7xekK1SKgeKJKerZz+uVWBt4dwOS2OediiZtDy+1VxhHuQucY1B8+hdAqKWAD9DRqWoXblCdd/8iEfq2yg/wWOrj+/9ZjQBmAaT2FtlMSMnvnFIKFUbMr2ZGZFdpBbNKe/DgPX8yaQ/YFqJvgbsUsd9qoZf2tx3S7iE8s2oMi/7cbXRr6wY0MD17VSJvb2eIIDQPWnjzob6ktwH61lpWucKNPrkVnOypXG5y4lg1Ry77Q718D3u+lgr4I5iv59m7Rfi11KoKzWxSHMjpDncoSmheHkpYiV9nXY6HraqkSguytWQrzLJxRfwDEvRsImALXkVYQhnxZEeGBD4ctd56rK22HfxWSbM+JXXQ+v9dPm6yplePlzqC68ShQik=
