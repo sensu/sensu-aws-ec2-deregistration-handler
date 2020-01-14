@@ -20,7 +20,7 @@ var (
 	awsConfig = aws.Config{
 		PluginConfig: sensu.PluginConfig{
 			Name:     "sensu-aws-ec2-deregistration-handler",
-			Short:    "removes sensu clients that do not have an allowed ec2 instance state",
+			Short:    "removes sensu entities that do not have an allowed ec2 instance state",
 			Timeout:  10,
 			Keyspace: "sensu.io/plugins/ec2deregistration/config",
 		},
