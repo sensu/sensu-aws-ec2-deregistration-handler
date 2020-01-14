@@ -72,8 +72,9 @@ sensu-aws-ec2-deregistration-handler -aws-access-key-id=aaaa -aws-secret-key=key
 ```
 
 ## Contributing
+
 See https://github.com/sensu/sensu-go/blob/master/CONTRIBUTING.md
 
 [1]: https://github.com/sensu/sensu-go
-[2]: https://docs.sensu.io/sensu-go/5.0/reference/handlers/#how-do-sensu-handlers-work
-[3]: https://github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/src
+[2]: https://docs.sensu.io/sensu-go/latest/reference/handlers/#how-do-sensu-handlers-work
+[3]: https://github.com/sensu/sensu-aws-ec2-deregistration-handler/src
