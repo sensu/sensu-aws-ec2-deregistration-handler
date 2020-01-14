@@ -190,6 +190,18 @@
   revision = "2315d5715e36303a941d907f038da7f7c44c773b"
 
 [[projects]]
+  branch = "master"
+  digest = "1:fd55a4633fbd0928ad39d93fd1b630d313474cad48567580abbbba1c21098e8f"
+  name = "github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler"
+  packages = [
+    "aws",
+    "http",
+    "sensu",
+  ]
+  pruneopts = "UT"
+  revision = "7e11e7c85e576769406096605d0daf17d2d94dfe"
+
+[[projects]]
   digest = "1:fc0476019952b9a2cd93bd4b3dfe6def3dfd04628d6137bf9489f848bd549fa8"
   name = "github.com/sensu/sensu-go"
   packages = [
@@ -360,6 +372,9 @@
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/ec2",
+    "github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/aws",
+    "github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/http",
+    "github.com/sensu-skunkworks/sensu-aws-ec2-deregistration-handler/sensu",
     "github.com/sensu/sensu-go/types",
     "github.com/sensu/sensu-plugins-go-library/sensu",
     "github.com/stretchr/testify/assert",
