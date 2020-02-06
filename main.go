@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"strings"
@@ -31,6 +33,7 @@ var (
 
 	sensuAPIURL string
 	sensuAPIKey string
+	sensuCACert string
 
 	options = []*sensu.PluginConfigOption{
 		{
@@ -109,10 +112,17 @@ var (
 			Path:      "sensu-api-key",
 			Env:       "SENSU_API_KEY",
 			Argument:  "sensu-api-key",
-			Shorthand: "k",
-			Default:   "",
+			Shorthand: "a",
 			Usage:     "The Sensu API key",
 			Value:     &sensuAPIKey,
+		},
+		{
+			Path:      "sensu-ca-cert",
+			Env:       "SENSU_CA_CERT",
+			Argument:  "sensu-ca-cert",
+			Shorthand: "c",
+			Usage:     "The Sensu Go CA Certificate",
+			Value:     &sensuCACert,
 		},
 	}
 
@@ -208,6 +218,7 @@ func executeHandler(event *types.Event) error {
 		return fmt.Errorf("could not initialize handler: %s", err)
 	}
 
+	log.Println("Getting AWS instance state")
 	instanceState, getErr := awsHandler.GetInstanceState()
 	if getErr != nil {
 		return fmt.Errorf("could not get instance state: %s", getErr)
@@ -229,6 +240,18 @@ func executeHandler(event *types.Event) error {
 		URL:    sensuAPIURL,
 		APIKey: sensuAPIKey,
 	}
+	if sensuCACert != "" {
+		asn1Data, err := ioutil.ReadFile(sensuCACert)
+		if err != nil {
+			return fmt.Errorf("unable to load sensu-ca-cert: %s", err)
+		}
+		cert, err := x509.ParseCertificate(asn1Data)
+		if err != nil {
+			return fmt.Errorf("invalid sensu-ca-cert: %s", err)
+		}
+		config.CACert = cert
+
+	}
 	client := httpclient.NewCoreClient(config)
 	request, err := httpclient.NewResourceRequest("core/v2", "Entity", event.Entity.Namespace, event.Entity.Name)
 	if err != nil {
@@ -236,6 +259,7 @@ func executeHandler(event *types.Event) error {
 	}
 
 	// Delete the Sensu entity
+	log.Printf("Deleting entity (%s/%s)", event.Entity.Namespace, event.Entity.Name)
 	if _, err := client.DeleteResource(context.Background(), request); err != nil {
 		if httperr, ok := err.(httpclient.HTTPError); ok {
 			if httperr.StatusCode < 500 {
