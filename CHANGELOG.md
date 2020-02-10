@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.2.1] - 2020-02-10
+
+### Fixed
+- Removed 32-bit builds in Bonsai
+
 ## [0.2.0] - 2020-02-10
 
 ### Changed
