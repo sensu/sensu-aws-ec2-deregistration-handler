@@ -1,4 +1,4 @@
-module github.com/sensu/sensu-aws-ec2-deregistration-handler
+module github.com/sensu/sensu-ec2-handler
 
 go 1.13
 
