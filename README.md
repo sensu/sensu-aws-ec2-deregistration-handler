@@ -69,6 +69,7 @@ sensu-ec2-handler < event.json
 ```
 
 Using command line arguments
+```
 sensu-ec2-handler -aws-access-key-id=aaaa -aws-secret-key=key -aws-region=us-east-2 -aws-instance-id-label=aws-instance-id -aws-allowed-instance-states=running,stopped,stopping -sensu-api-url=http://localhost:8080 -sensu-api-username=admin -sensu-api-password=password < event.json
 ```
 
