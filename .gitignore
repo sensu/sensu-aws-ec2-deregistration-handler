@@ -22,3 +22,5 @@ builds/
 
 # Intellij IDE
 .idea/
+
+event.json
