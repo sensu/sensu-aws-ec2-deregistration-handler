@@ -1,6 +1,8 @@
-# Sensu Go <HandlerName> Handler
+# Sensu Go EC2 Handler
 
-The [Sensu Go][1] AWS EC2 Deregistration handler is a [Sensu Event Handler][2] that checks an AWS EC2 instance and removes it from Sensu if it is not in one of the specified state.
+The [Sensu Go][1] AWS EC2 handler is a [Sensu Event Handler][2] that checks an
+AWS EC2 instance and removes it from Sensu if it is not in one of the specified
+state.
 
 ## Configuration
 
@@ -16,7 +18,7 @@ Example Sensu Go handler definition:
     },
     "spec": {
         "type": "pipe",
-        "command": "sensu-aws-ec2-deregistration-handler -aws-access-key-id=aaaa -aws-secret-key=key -aws-region=us-east-2 -aws-instance-id-label=aws-instance-id -aws-allowed-instance-states=running,stopped,stopping -sensu-api-url=http://localhost:8080 -sensu-api-username=admin -sensu-api-password=password",
+        "command": "sensu-ec2-handler -aws-access-key-id=aaaa -aws-secret-key=key -aws-region=us-east-2 -aws-instance-id-label=aws-instance-id -aws-allowed-instance-states=running,stopped,stopping -sensu-api-url=http://localhost:8080 -sensu-api-username=admin -sensu-api-password=password",
         "timeout": 10,
         "filters": [
             "is_incident"
@@ -37,7 +39,7 @@ The AWS EC2 instance ID can be read either as a handler option, or using an enti
 removes sensu clients that do not have an allowed ec2 instance state
 
 Usage:
-  sensu-aws-ec2-deregistration-handler [flags]
+  sensu-ec2-handler [flags]
 
 Flags:
   -k, --aws-access-key-id string             The AWS access key id to authenticate
@@ -46,7 +48,7 @@ Flags:
   -l, --aws-instance-id-label string         The entity label containing the AWS instance ID
   -r, --aws-region string                    The AWS region (default "us-east-1")
   -s, --aws-secret-key string                The AWS secret key id to authenticate
-  -h, --help                                 help for sensu-aws-ec2-deregistration-handler
+  -h, --help                                 help for sensu-ec2-handler
   -p, --sensu-api-password string            The Sensu API password
   -U, --sensu-api-url string                 The Sensu API URL (default "http://localhost:8080")
   -u, --sensu-api-username string            The Sensu API username
@@ -63,12 +65,11 @@ export AWS_ALLOWED_INSTANCE_STATES=running,stopped,stopping
 export SENSU_API_URL=http://localhost:8080
 export SENSU_API_USERNAME=admin
 export SENSU_API_PASSWORD=password
-sensu-aws-ec2-deregistration-handler < event.json
+sensu-ec2-handler < event.json
 ```
 
 Using command line arguments
-```bash
-sensu-aws-ec2-deregistration-handler -aws-access-key-id=aaaa -aws-secret-key=key -aws-region=us-east-2 -aws-instance-id-label=aws-instance-id -aws-allowed-instance-states=running,stopped,stopping -sensu-api-url=http://localhost:8080 -sensu-api-username=admin -sensu-api-password=password < event.json
+sensu-ec2-handler -aws-access-key-id=aaaa -aws-secret-key=key -aws-region=us-east-2 -aws-instance-id-label=aws-instance-id -aws-allowed-instance-states=running,stopped,stopping -sensu-api-url=http://localhost:8080 -sensu-api-username=admin -sensu-api-password=password < event.json
 ```
 
 ## Contributing
@@ -77,4 +78,3 @@ See https://github.com/sensu/sensu-go/blob/master/CONTRIBUTING.md
 
 [1]: https://github.com/sensu/sensu-go
 [2]: https://docs.sensu.io/sensu-go/latest/reference/handlers/#how-do-sensu-handlers-work
-[3]: https://github.com/sensu/sensu-aws-ec2-deregistration-handler/src

@@ -7,6 +7,16 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.2.0] - 2020-02-10
+
+### Changed
+- Renamed the project to sensu-ec2-handler
+
+## [0.1.0] - 2020-02-07
+
+### Changed
+- Refactoring to use sensu-plugin-sdk
+
 ## [0.0.1] - 2020-01-14
 
 ### Added
