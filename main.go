@@ -11,7 +11,7 @@ import (
 
 	"github.com/sensu-community/sensu-plugin-sdk/httpclient"
 	"github.com/sensu-community/sensu-plugin-sdk/sensu"
-	"github.com/sensu/sensu-aws-ec2-deregistration-handler/aws"
+	"github.com/jgrasser/sensu-ec2-handler/aws"
 	"github.com/sensu/sensu-go/types"
 )
 
@@ -54,6 +54,15 @@ var (
 			Usage:     "The AWS secret key id to authenticate",
 			Value:     &awsConfig.AwsSecretKey,
 		},
+                {
+                        Path:      "sensu-aws-role-arn",
+                        Env:       "SENSU_AWS_ROLE_ARN",
+                        Argument:  "sensu-aws-role-arn",
+                        Shorthand: "R",
+                        Default:   "",
+                        Usage:     "The AWS Role ARN to assume",
+                        Value:     &awsConfig.SensuRoleArn,
+                },
 		{
 			Path:      "aws-instance-id",
 			Env:       "AWS_INSTANCE_ID",
@@ -146,12 +155,6 @@ func main() {
 func checkArgs(event *types.Event) error {
 	retrieveAwsInstanceId(event)
 
-	if len(awsConfig.AwsAccessKeyId) == 0 {
-		return fmt.Errorf("aws-access-key-id must contain a value")
-	}
-	if len(awsConfig.AwsSecretKey) == 0 {
-		return fmt.Errorf("aws-secret-key must contain a value")
-	}
 	if len(awsConfig.AwsInstanceId) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
 	}
