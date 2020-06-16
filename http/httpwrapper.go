@@ -12,20 +12,22 @@ import (
 	"time"
 )
 
-type HttpWrapper struct {
+// Wrapper is a http wrapper
+type Wrapper struct {
 	httpClient  *http.Client
 	username    string
 	password    string
 	bearerToken string
 }
 
-func NewBasicAuthHttpWrapper(timeout uint64, proxy string, username string, password string) (*HttpWrapper, error) {
-	httpClient, err := setupHttpClient(timeout, proxy)
+// NewBasicAuthWrapper creates a new basic auth wrapper
+func NewBasicAuthWrapper(timeout uint64, proxy string, username string, password string) (*Wrapper, error) {
+	httpClient, err := setupHTTPClient(timeout, proxy)
 	if err != nil {
 		return nil, err
 	}
 
-	return &HttpWrapper{
+	return &Wrapper{
 		httpClient,
 		username,
 		password,
@@ -33,13 +35,14 @@ func NewBasicAuthHttpWrapper(timeout uint64, proxy string, username string, pass
 	}, nil
 }
 
-func NewBearerTokenHttpWrapper(timeout uint64, proxy string, bearerToken string) (*HttpWrapper, error) {
-	httpClient, err := setupHttpClient(timeout, proxy)
+// NewBearerTokenWrapper creates a new bearer token wrapper
+func NewBearerTokenWrapper(timeout uint64, proxy string, bearerToken string) (*Wrapper, error) {
+	httpClient, err := setupHTTPClient(timeout, proxy)
 	if err != nil {
 		return nil, err
 	}
 
-	return &HttpWrapper{
+	return &Wrapper{
 		httpClient,
 		"",
 		"",
@@ -47,17 +50,17 @@ func NewBearerTokenHttpWrapper(timeout uint64, proxy string, bearerToken string)
 	}, nil
 }
 
-func setupHttpClient(timeout uint64, proxy string) (*http.Client, error) {
+func setupHTTPClient(timeout uint64, proxy string) (*http.Client, error) {
 	var httpClient *http.Client
 
 	if len(proxy) > 0 {
-		proxyUrl, err := url.Parse(proxy)
+		proxyURL, err := url.Parse(proxy)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing proxy host %s: %s", proxy, err)
 		}
 		httpClient = &http.Client{
 			Transport: &http.Transport{
-				Proxy: http.ProxyURL(proxyUrl),
+				Proxy: http.ProxyURL(proxyURL),
 			},
 			Timeout: time.Second * time.Duration(timeout),
 		}
@@ -75,7 +78,7 @@ func setupHttpClient(timeout uint64, proxy string) (*http.Client, error) {
 // url specifies the URL to call
 // body interface is serialized into a JSON string and sent in the HTTP body
 // result will contain the HTTP call result deserialized from its JSON string
-func (httpWrapper *HttpWrapper) ExecuteRequest(method string, url string, body interface{}, result interface{}) (int, string, error) {
+func (httpWrapper *Wrapper) ExecuteRequest(method string, url string, body interface{}, result interface{}) (int, string, error) {
 
 	var bodyBytes []byte
 	var bodyReader io.Reader
@@ -110,19 +113,19 @@ func (httpWrapper *HttpWrapper) ExecuteRequest(method string, url string, body i
 
 	log.Println("HTTP response status code:", response.StatusCode)
 
-	resultJson := string(buf)
+	resultJSON := string(buf)
 
 	if result != nil {
 		err = json.Unmarshal(buf, result)
 		if err != nil {
-			return response.StatusCode, resultJson, fmt.Errorf("error unmarshalling json: %s", err)
+			return response.StatusCode, resultJSON, fmt.Errorf("error unmarshalling json: %s", err)
 		}
 	}
 
-	return response.StatusCode, resultJson, nil
+	return response.StatusCode, resultJSON, nil
 }
 
-func (httpWrapper *HttpWrapper) setupAuthentication(request *http.Request) {
+func (httpWrapper *Wrapper) setupAuthentication(request *http.Request) {
 	if len(httpWrapper.bearerToken) > 0 {
 		request.Header.Add("Authorization", "Bearer "+httpWrapper.bearerToken)
 	} else {

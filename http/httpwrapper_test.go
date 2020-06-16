@@ -5,20 +5,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"math"
 	. "net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type sampleData struct {
 	SampleString string `json:"sampleString"`
 }
 
-func TestNoProxy_NewHttpWrapper(t *testing.T) {
-	httpWrapper, err := NewBasicAuthHttpWrapper(120, "", "username", "password")
+func TestNoProxy_NewWrapper(t *testing.T) {
+	httpWrapper, err := NewBasicAuthWrapper(120, "", "username", "password")
 	assert.NoError(t, err, "No error should be returned")
 	assert.NotNil(t, httpWrapper, "HttpWrapper should be returned")
 	assert.Nil(t, httpWrapper.httpClient.Transport, "HTTP transport should be nil")
@@ -26,8 +27,8 @@ func TestNoProxy_NewHttpWrapper(t *testing.T) {
 	assert.Equal(t, time.Second*time.Duration(120), httpWrapper.httpClient.Timeout)
 }
 
-func TestProxy_NewHttpWrapper(t *testing.T) {
-	httpWrapper, err := NewBasicAuthHttpWrapper(120, "http://proxy:8080", "username", "password")
+func TestProxy_NewWrapper(t *testing.T) {
+	httpWrapper, err := NewBasicAuthWrapper(120, "http://proxy:8080", "username", "password")
 	assert.NoError(t, err, "No error should be returned")
 	assert.NotNil(t, httpWrapper, "HttpWrapper should be returned")
 	assert.NotNil(t, httpWrapper.httpClient.Transport, "HTTP transport should be set")
@@ -35,15 +36,15 @@ func TestProxy_NewHttpWrapper(t *testing.T) {
 	assert.Equal(t, time.Second*time.Duration(120), httpWrapper.httpClient.Timeout)
 }
 
-func TestInvalidProxy_NewHttpWrapper(t *testing.T) {
-	httpWrapper, err := NewBasicAuthHttpWrapper(120, "://proxy:8080", "username", "password")
+func TestInvalidProxy_NewWrapper(t *testing.T) {
+	httpWrapper, err := NewBasicAuthWrapper(120, "://proxy:8080", "username", "password")
 	assert.Error(t, err, "No error should be returned")
 	assert.Nil(t, httpWrapper, "HttpWrapper should be nil")
 }
 
 func TestMarshallError_ExecuteRequest(t *testing.T) {
 	// This test doesn't need the http client
-	httpWrapper := HttpWrapper{}
+	httpWrapper := Wrapper{}
 
 	// Send in unmarshable body data
 	statusCode, resultStr, err := httpWrapper.ExecuteRequest("POST", "https://www.google.com", math.Inf(1), nil)
@@ -55,7 +56,7 @@ func TestMarshallError_ExecuteRequest(t *testing.T) {
 
 func TestInvalidMethod_ExecuteRequest(t *testing.T) {
 	// This test doesn't need the http client
-	httpWrapper := HttpWrapper{}
+	httpWrapper := Wrapper{}
 
 	// Send in invalid HTTP method
 	statusCode, resultStr, err := httpWrapper.ExecuteRequest(":GOOBLEGOOK", "https://www.google.com", nil, nil)
@@ -82,7 +83,7 @@ func TestNoResult_ExecuteRequest(t *testing.T) {
 	})
 
 	// This test doesn't need the http client
-	httpWrapper := HttpWrapper{
+	httpWrapper := Wrapper{
 		client,
 		"user",
 		"pwd",
@@ -116,7 +117,7 @@ func TestReaderError_ExecuteRequest(t *testing.T) {
 	})
 
 	// This test doesn't need the http client
-	httpWrapper := HttpWrapper{
+	httpWrapper := Wrapper{
 		client,
 		"user",
 		"pwd",
@@ -151,7 +152,7 @@ func TestWithResult_ExecuteRequest(t *testing.T) {
 	})
 
 	// This test doesn't need the http client
-	httpWrapper := HttpWrapper{
+	httpWrapper := Wrapper{
 		client,
 		"user",
 		"pwd",
@@ -191,7 +192,7 @@ func TestWithUnmarshallingResultError_ExecuteRequest(t *testing.T) {
 	})
 
 	// This test doesn't need the http client
-	httpWrapper := HttpWrapper{
+	httpWrapper := Wrapper{
 		client,
 		"user",
 		"pwd",

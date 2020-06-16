@@ -15,13 +15,13 @@ var (
 	describeInstanceStatusIncludeAllInstances = true
 )
 
+// Config is the aws config
 type Config struct {
 	sensu.PluginConfig
-	AwsAccessKeyId string
-	AwsSecretKey   string
-	AwsRegion      string
-	AwsInstanceId  string
-	//AwsAccounts           string
+	AwsAccessKeyID        string
+	AwsSecretKey          string
+	AwsRegion             string
+	AwsInstanceID         string
 	AllowedInstanceStates string
 	Timeout               uint64
 
@@ -30,12 +30,14 @@ type Config struct {
 	AllowedInstanceStatesMap map[string]bool
 }
 
+// Handler is the aws handler
 type Handler struct {
 	config     *Config
 	awsSession *session.Session
 	ec2Service *ec2.EC2
 }
 
+// NewHandler creates a new handler
 func NewHandler(config *Config) (*Handler, error) {
 	handler := Handler{
 		config: config,
@@ -52,7 +54,7 @@ func NewHandler(config *Config) (*Handler, error) {
 func (awsHandler *Handler) initAws() error {
 	log.Println("Creating AWS session...")
 	var err error
-	creds := credentials.NewStaticCredentials(awsHandler.config.AwsAccessKeyId, awsHandler.config.AwsSecretKey, "")
+	creds := credentials.NewStaticCredentials(awsHandler.config.AwsAccessKeyID, awsHandler.config.AwsSecretKey, "")
 
 	awsHandler.awsSession, err = session.NewSession(&aws.Config{
 		Region:      aws.String(awsHandler.config.AwsRegion),
@@ -68,24 +70,25 @@ func (awsHandler *Handler) initAws() error {
 	return nil
 }
 
+// GetInstanceState gets the instance state
 func (awsHandler *Handler) GetInstanceState() (string, error) {
-	instanceId := awsHandler.config.AwsInstanceId
-	log.Printf("Retrieving AWS instance state for %s\n", instanceId)
+	instanceID := awsHandler.config.AwsInstanceID
+	log.Printf("Retrieving AWS instance state for %s\n", instanceID)
 
 	request := &ec2.DescribeInstanceStatusInput{
-		InstanceIds:         []*string{aws.String(instanceId)},
+		InstanceIds:         []*string{aws.String(instanceID)},
 		IncludeAllInstances: &describeInstanceStatusIncludeAllInstances,
 	}
 	response, err := awsHandler.ec2Service.DescribeInstanceStatus(request)
 	if err != nil {
-		return "", fmt.Errorf("error getting instance state for %s: %s", instanceId, err)
+		return "", fmt.Errorf("error getting instance state for %s: %s", instanceID, err)
 	}
 
 	instanceStatuses := response.InstanceStatuses
 	if len(instanceStatuses) == 0 {
-		return "", fmt.Errorf("could not get status for %s", instanceId)
+		return "", fmt.Errorf("could not get status for %s", instanceID)
 	} else if len(instanceStatuses) > 1 {
-		return "", fmt.Errorf("more than one instance found for %s", instanceId)
+		return "", fmt.Errorf("more than one instance found for %s", instanceID)
 	}
 
 	return *instanceStatuses[0].InstanceState.Name, nil
