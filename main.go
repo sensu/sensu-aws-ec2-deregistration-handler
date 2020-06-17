@@ -137,7 +137,7 @@ var (
 )
 
 func main() {
-	goHandler := sensu.NewEnterpriseGoHandler(&awsConfig.PluginConfig, options, checkArgs, executeHandler)
+	goHandler := sensu.NewGoHandler(&awsConfig.PluginConfig, options, checkArgs, executeHandler)
 	goHandler.Execute()
 }
 
