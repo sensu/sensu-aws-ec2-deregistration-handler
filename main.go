@@ -11,8 +11,8 @@ import (
 
 	"github.com/sensu-community/sensu-plugin-sdk/httpclient"
 	"github.com/sensu-community/sensu-plugin-sdk/sensu"
-	"github.com/sensu/sensu-aws-ec2-deregistration-handler/aws"
-	"github.com/sensu/sensu-go/types"
+	"github.com/sensu/sensu-ec2-handler/aws"
+	corev2 "github.com/sensu/sensu-go/api/core/v2"
 )
 
 const (
@@ -29,7 +29,7 @@ var (
 		},
 	}
 
-	awsInstanceIdLabel = ""
+	awsInstanceIDLabel = ""
 
 	sensuAPIURL string
 	sensuAPIKey string
@@ -43,7 +43,7 @@ var (
 			Shorthand: "k",
 			Default:   "",
 			Usage:     "The AWS access key id to authenticate",
-			Value:     &awsConfig.AwsAccessKeyId,
+			Value:     &awsConfig.AwsAccessKeyID,
 		},
 		{
 			Path:      "aws-secret-key",
@@ -61,7 +61,7 @@ var (
 			Shorthand: "i",
 			Default:   "",
 			Usage:     "The AWS instance ID",
-			Value:     &awsConfig.AwsInstanceId,
+			Value:     &awsConfig.AwsInstanceID,
 		},
 		{
 			Path:      "aws-instance-id-label",
@@ -70,7 +70,7 @@ var (
 			Shorthand: "l",
 			Default:   "aws-instance-id",
 			Usage:     "The entity label containing the AWS instance ID",
-			Value:     &awsInstanceIdLabel,
+			Value:     &awsInstanceIDLabel,
 		},
 		{
 			Path:      "aws-region",
@@ -143,16 +143,16 @@ func main() {
 
 // checkArgs is invoked by the go handler to perform validation of the values. If an error is returned
 // the handler will not be executed.
-func checkArgs(event *types.Event) error {
-	retrieveAwsInstanceId(event)
+func checkArgs(event *corev2.Event) error {
+	retrieveAwsInstanceID(event)
 
-	if len(awsConfig.AwsAccessKeyId) == 0 {
+	if len(awsConfig.AwsAccessKeyID) == 0 {
 		return fmt.Errorf("aws-access-key-id must contain a value")
 	}
 	if len(awsConfig.AwsSecretKey) == 0 {
 		return fmt.Errorf("aws-secret-key must contain a value")
 	}
-	if len(awsConfig.AwsInstanceId) == 0 {
+	if len(awsConfig.AwsInstanceID) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
 	}
 	if len(awsConfig.AwsRegion) == 0 {
@@ -188,27 +188,27 @@ func checkArgs(event *types.Event) error {
 	return nil
 }
 
-// retrieveAwsInstanceId sets the AWS instance id using the entity label or entity name
+// retrieveAwsInstanceID sets the AWS instance id using the entity label or entity name
 // if the actual instance id is not set on the command line.
-func retrieveAwsInstanceId(event *types.Event) {
-	if len(awsConfig.AwsInstanceId) > 0 {
+func retrieveAwsInstanceID(event *corev2.Event) {
+	if len(awsConfig.AwsInstanceID) > 0 {
 		return
 	}
 
-	if len(awsInstanceIdLabel) > 0 {
-		if len(event.Entity.Labels[awsInstanceIdLabel]) > 0 {
-			log.Printf("Using %s entity label as the AWS instance ID\n", awsInstanceIdLabel)
-			awsConfig.AwsInstanceId = event.Entity.Labels[awsInstanceIdLabel]
+	if len(awsInstanceIDLabel) > 0 {
+		if len(event.Entity.Labels[awsInstanceIDLabel]) > 0 {
+			log.Printf("Using %s entity label as the AWS instance ID\n", awsInstanceIDLabel)
+			awsConfig.AwsInstanceID = event.Entity.Labels[awsInstanceIDLabel]
 		}
 	}
-	if len(awsConfig.AwsInstanceId) == 0 {
+	if len(awsConfig.AwsInstanceID) == 0 {
 		log.Println("Using entity name as the AWS instance ID")
-		awsConfig.AwsInstanceId = event.Entity.Name
+		awsConfig.AwsInstanceID = event.Entity.Name
 	}
 }
 
 // executeHandler is executed by the go handler and executes the handler business logic.
-func executeHandler(event *types.Event) error {
+func executeHandler(event *corev2.Event) error {
 	if event.Check.Name != keepAliveEventName {
 		return fmt.Errorf("received non-keepalive event, not checking ec2 instance state")
 	}
@@ -229,11 +229,11 @@ func executeHandler(event *types.Event) error {
 	// Validate instance state
 	if _, ok := awsConfig.AllowedInstanceStatesMap[instanceState]; ok {
 		log.Printf("'%s' is a valid instance state, not deregistering '%s' entity from Sensu for '%s' AWS instance", instanceState,
-			event.Entity.Name, awsConfig.AwsInstanceId)
+			event.Entity.Name, awsConfig.AwsInstanceID)
 		return nil
 	}
 	log.Printf("'%s' is not a valid instance state, deregistering '%s' entity from Sensu for '%s' AWS instance", instanceState,
-		event.Entity.Name, awsConfig.AwsInstanceId)
+		event.Entity.Name, awsConfig.AwsInstanceID)
 
 	// First authenticate against the Sensu API
 	config := httpclient.CoreClientConfig{
