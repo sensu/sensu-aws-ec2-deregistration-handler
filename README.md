@@ -130,7 +130,7 @@ override the corresponding environment variable.
 |--timeout                    |TIMEOUT                    |
 
 **Security Note:** Care should be taken to not expose the AWS access and secret
-keys and the Sensu API key information for this handler by specifying them on
+keys or the Sensu API key information for this handler by specifying them on
 the command line or by directly setting the environment variables in the handler
 definition.  It is suggested to make use of [secrets management][5] to surface
 them as environment variables.  The handler definition above references them as
