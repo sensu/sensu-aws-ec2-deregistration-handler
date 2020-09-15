@@ -5,6 +5,7 @@
 *.so
 *.dylib
 sensu-aws-ec2-deregistration-handler
+sensu-aws-ec2-handler
 
 # Test binary, build with `go test -c`
 *.test
