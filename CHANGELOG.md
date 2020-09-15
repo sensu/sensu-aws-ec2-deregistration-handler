@@ -8,7 +8,7 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 ## Unreleased
 
 ### Breaking change
-- Changed annotation keyspace from "seensu.io/plugins/ec2deregistration/config"to
+- Changed annotation keyspace from "sensu.io/plugins/ec2deregistration/config"to
   "sensu.io/plugins/sensu-ec2-handler/config" for consistency
 
 ### Changed
