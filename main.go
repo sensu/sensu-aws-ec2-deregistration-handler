@@ -22,10 +22,10 @@ const (
 var (
 	awsConfig = aws.Config{
 		PluginConfig: sensu.PluginConfig{
-			Name:     "sensu-aws-ec2-deregistration-handler",
+			Name:     "sensu-ec2-handler",
 			Short:    "removes sensu entities that do not have an allowed ec2 instance state",
 			Timeout:  10,
-			Keyspace: "sensu.io/plugins/ec2deregistration/config",
+			Keyspace: "sensu.io/plugins/sensu-ec2-handler/config",
 		},
 	}
 
@@ -42,6 +42,7 @@ var (
 			Argument:  "aws-access-key-id",
 			Shorthand: "k",
 			Default:   "",
+			Secret:    true,
 			Usage:     "The AWS access key id to authenticate",
 			Value:     &awsConfig.AwsAccessKeyID,
 		},
@@ -51,6 +52,7 @@ var (
 			Argument:  "aws-secret-key",
 			Shorthand: "s",
 			Default:   "",
+			Secret:    true,
 			Usage:     "The AWS secret key id to authenticate",
 			Value:     &awsConfig.AwsSecretKey,
 		},
@@ -113,6 +115,7 @@ var (
 			Env:       "SENSU_API_KEY",
 			Argument:  "sensu-api-key",
 			Shorthand: "a",
+			Secret:    true,
 			Usage:     "The Sensu API key",
 			Value:     &sensuAPIKey,
 		},
