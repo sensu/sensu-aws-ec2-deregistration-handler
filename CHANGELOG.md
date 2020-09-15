@@ -7,8 +7,15 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Breaking change
+- Changed annotation keyspace from "seensu.io/plugins/ec2deregistration/config"to
+  "sensu.io/plugins/sensu-ec2-handler/config" for consistency
+
 ### Changed
 - Update Sensu Go and SDK dependencies with the correct modules
+- README updates
+- Add Secret: true to appropriate options
+- Changed PluginConfig to be more consistent with new name
 
 ## [0.2.1] - 2020-02-10
 
