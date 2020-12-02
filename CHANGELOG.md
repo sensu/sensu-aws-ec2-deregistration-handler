@@ -16,6 +16,8 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 - README updates
 - Add Secret: true to appropriate options
 - Changed PluginConfig to be more consistent with new name
+- Changed auth to support instance roles, shared credentials
+- Added auth support for assuming a role
 
 ## [0.2.1] - 2020-02-10
 

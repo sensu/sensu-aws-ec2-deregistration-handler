@@ -127,6 +127,14 @@ var (
 			Usage:     "The Sensu Go CA Certificate",
 			Value:     &sensuCACert,
 		},
+		{
+			Path:      "aws-role-arn",
+			Env:       "AWS_ROLE_ARN",
+			Argument:  "aws-role-arn",
+			Shorthand: "R",
+			Usage:     "The AWS IAM Role to assume",
+			Value:     &awsConfig.RoleArn,
+		},
 	}
 
 	validInstanceStates = map[string]bool{
@@ -149,12 +157,6 @@ func main() {
 func checkArgs(event *corev2.Event) error {
 	retrieveAwsInstanceID(event)
 
-	if len(awsConfig.AwsAccessKeyID) == 0 {
-		return fmt.Errorf("aws-access-key-id must contain a value")
-	}
-	if len(awsConfig.AwsSecretKey) == 0 {
-		return fmt.Errorf("aws-secret-key must contain a value")
-	}
 	if len(awsConfig.AwsInstanceID) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
 	}
