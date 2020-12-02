@@ -26,7 +26,7 @@ type Config struct {
 	AwsInstanceID         string
 	AllowedInstanceStates string
 	Timeout               uint64
-	RoleArn               string
+	AssumeRoleArn         string
 
 	// Computed from the input
 	AwsAccountsMap           map[string]bool
@@ -76,9 +76,9 @@ func (awsHandler *Handler) initAws() error {
 
 	log.Println("Session created!")
 
-	if arn.IsARN(awsHandler.config.RoleArn) {
+	if arn.IsARN(awsHandler.config.AssumeRoleArn) {
 		log.Println("Using Role ARN")
-		creds := stscreds.NewCredentials(awsHandler.awsSession, awsHandler.config.RoleArn)
+		creds := stscreds.NewCredentials(awsHandler.awsSession, awsHandler.config.AssumeRoleArn)
 		awsHandler.ec2Service = ec2.New(awsHandler.awsSession, &aws.Config{Credentials: creds})
 	} else {
 		awsHandler.ec2Service = ec2.New(awsHandler.awsSession)

@@ -38,12 +38,15 @@ Usage:
 
 Flags:
   -k, --aws-access-key-id string             The AWS access key id to authenticate
+  -s, --aws-secret-key string                The AWS secret key id to authenticate
   -S, --aws-allowed-instance-states string   The EC2 instance states allowed (default "running")
   -i, --aws-instance-id string               The AWS instance ID
   -l, --aws-instance-id-label string         The entity label containing the AWS instance ID
   -r, --aws-region string                    The AWS region (default "us-east-1")
-  -s, --aws-secret-key string                The AWS secret key id to authenticate
+  -R, --aws-assume-role-arn string           The AWS IAM Role to assume, if necessary
   -U, --sensu-api-url string                 The Sensu API URL (default "http://localhost:8080")
+  -a, --sensu-api-key string                 The Sensu API key
+  -c, --sensu-ca-cert string                 The Sensu Go CA Certificate
   -t, --timeout uint                         The plugin timeout (default 10)```
   -h, --help                                 help for sensu-ec2-handler
 ```
@@ -124,6 +127,7 @@ override the corresponding environment variable.
 |--aws-instance-id            |AWS_INSTANCE_ID            |
 |--aws-instance-id-label      |AWS_INSTANCE_ID_LABEL      |
 |--aws-allowed-instance-states|AWS_ALLOWED_INSTANCE_STATES|
+|--aws-assume-role-arn        |AWS_ASSUME_ROLE_ARN        |
 |--sensu-api-url              |SENSU_API_URL              |
 |--sensu-api-key              |SENSU_API_KEY              |
 |--sensu-ca-cert              |SENSU_CA_CERT              |
@@ -170,6 +174,32 @@ All arguments for this handler are tunable on a per entity or check basis based
 on annotations.  The annotations keyspace for this handler is
 `sensu.io/plugins/sensu-ec2-handler/config`.
 
+###  AWS Credentials
+
+This plugin makes use of the AWS SDK for Go.  The SDK uses the [default credential provider chain][7]
+to find AWS credentials.  The SDK uses the first provider in the chain that returns credentials
+without an error. The default provider chain looks for credentials in the following order:
+
+1. Environment variables (AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, and AWS_REGION).
+
+2. Shared credentials file (typically ~/.aws/credentials).
+
+3. If your application is running on an Amazon EC2 instance, IAM role for Amazon EC2.
+
+4. If your application uses an ECS task definition or RunTask API operation, IAM role for tasks.
+
+The SDK detects and uses the built-in providers automatically, without requiring manual configurations.
+For example, if you use IAM roles for Amazon EC2 instances, your applications automatically use the
+instance’s credentials. You don’t need to manually configure credentials in your application.
+
+Source: [Configuring the AWS SDK for Go][8]
+
+This plugin also supports assuming a new role upon authentication using the `--aws-assume-role-arn`
+option.
+
+If you go the route of using environment variables, it is highly suggested you use them via the
+[Env secrets provider][6].
+
 ### Proxy Support
 
 This handler supports the use of the environment variables HTTP_PROXY,
@@ -201,4 +231,6 @@ See https://github.com/sensu/sensu-go/blob/master/CONTRIBUTING.md
 [4]: https://docs.sensu.io/sensu-go/latest/reference/assets/
 [5]: https://docs.sensu.io/sensu-go/latest/guides/secrets-management/
 [6]: https://docs.sensu.io/sensu-go/latest/guides/secrets-management/#use-env-for-secrets-management
+[7]: https://docs.aws.amazon.com/sdk-for-go/api/aws/defaults/#CredChain
+[8]: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html
 

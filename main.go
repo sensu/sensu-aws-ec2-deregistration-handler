@@ -128,12 +128,12 @@ var (
 			Value:     &sensuCACert,
 		},
 		{
-			Path:      "aws-role-arn",
-			Env:       "AWS_ROLE_ARN",
-			Argument:  "aws-role-arn",
+			Path:      "aws-assume-role-arn",
+			Env:       "AWS_ASSUME_ROLE_ARN",
+			Argument:  "aws-assume-role-arn",
 			Shorthand: "R",
 			Usage:     "The AWS IAM Role to assume",
-			Value:     &awsConfig.RoleArn,
+			Value:     &awsConfig.AssumeRoleArn,
 		},
 	}
 
