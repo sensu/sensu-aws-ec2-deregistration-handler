@@ -160,9 +160,6 @@ func checkArgs(event *corev2.Event) error {
 	if len(awsConfig.AwsInstanceID) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
 	}
-	if len(awsConfig.AwsRegion) == 0 {
-		return fmt.Errorf("aws-region must contain a value")
-	}
 	if len(awsConfig.AllowedInstanceStates) == 0 {
 		return fmt.Errorf("allowed-instance-states must contain at least one value")
 	}
