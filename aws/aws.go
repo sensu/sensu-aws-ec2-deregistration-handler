@@ -84,7 +84,6 @@ func (awsHandler *Handler) initAws() error {
 		awsHandler.ec2Service = ec2.New(awsHandler.awsSession)
 	}
 
-
 	return nil
 }
 
