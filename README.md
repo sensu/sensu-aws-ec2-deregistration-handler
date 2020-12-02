@@ -10,6 +10,7 @@
   - [Handler definition](#handler-definition)
   - [Environment variables](#environment-variables)
   - [Annotations](#annotations)
+  - [AWS Credentials](#aws-credentials)
   - [Proxy support](#proxy-support)
 - [Installation from source](#installation-from-source)
 - [Contributing](#contributing)
