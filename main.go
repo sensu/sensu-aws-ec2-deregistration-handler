@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/sensu-community/sensu-plugin-sdk/httpclient"
 	"github.com/sensu-community/sensu-plugin-sdk/sensu"
 	"github.com/sensu/sensu-ec2-handler/aws"
@@ -172,6 +173,11 @@ func checkArgs(event *corev2.Event) error {
 	}
 	if len(sensuAPIKey) == 0 {
 		return fmt.Errorf("sensu-api-key must contain a value")
+	}
+	if len(awsConfig.AssumeRoleArn) > 0 {
+		if !arn.IsARN(awsConfig.AssumeRoleArn) {
+			return fmt.Errorf("aws-assume-role-arn %s is not a valid ARN", awsConfig.AssumeRoleArn)
+		}
 	}
 
 	// parse the instance states

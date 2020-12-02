@@ -18,4 +18,8 @@ func TestCheckArgs(t *testing.T) {
 	assert.Error(checkArgs(event))
 	sensuAPIKey = "e2bf4da0-ffcc-4744-b29c-94ff9a504e38"
 	assert.NoError(checkArgs(event))
+	awsConfig.AssumeRoleArn = "arn:not:valid"
+	assert.Error(checkArgs(event))
+	awsConfig.AssumeRoleArn = "arn:aws:iam::123456789012:role/test"
+	assert.NoError(checkArgs(event))
 }
