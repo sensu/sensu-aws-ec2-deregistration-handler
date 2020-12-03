@@ -177,7 +177,7 @@ on annotations.  The annotations keyspace for this handler is
 
 ###  AWS Credentials
 
-**NOTE:** Providing AWS credientials via the command line arguments `--aws-access-key-id` and
+**NOTE:** Providing AWS credentials via the command line arguments `--aws-access-key-id` and
 `--aws-secret-key` is deprecated and will be removed in a future release.  Please use one
 of the methods below.
 
