@@ -177,6 +177,10 @@ on annotations.  The annotations keyspace for this handler is
 
 ###  AWS Credentials
 
+*NOTE:* Providing AWS credientials via the command line arguments `--aws-access-key-id` and
+`--aws-secret-key` is deprecated and will be removed in a future release.  Please use one
+of the methods below.
+
 This plugin makes use of the AWS SDK for Go.  The SDK uses the [default credential provider chain][7]
 to find AWS credentials.  The SDK uses the first provider in the chain that returns credentials
 without an error. The default provider chain looks for credentials in the following order:

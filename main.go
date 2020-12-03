@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/arn"
@@ -44,7 +45,7 @@ var (
 			Shorthand: "k",
 			Default:   "",
 			Secret:    true,
-			Usage:     "The AWS access key id to authenticate",
+			Usage:     "The AWS access key id to authenticate (deprecated, use env variable instead)",
 			Value:     &awsConfig.AwsAccessKeyID,
 		},
 		{
@@ -54,7 +55,7 @@ var (
 			Shorthand: "s",
 			Default:   "",
 			Secret:    true,
-			Usage:     "The AWS secret key id to authenticate",
+			Usage:     "The AWS secret key id to authenticate (deprecated, use env variable instead)",
 			Value:     &awsConfig.AwsSecretKey,
 		},
 		{
@@ -157,6 +158,12 @@ func main() {
 // the handler will not be executed.
 func checkArgs(event *corev2.Event) error {
 	retrieveAwsInstanceID(event)
+
+	// Check for deprecated use of command line specification of keys
+	if (len(awsConfig.AwsAccessKeyID) > 0 && len(os.Getenv("AWS_ACCESS_KEY_ID")) == 0) ||
+		(len(awsConfig.AwsSecretKey) > 0 && len(os.Getenv("AWS_SECRET_KEY")) == 0) {
+		log.Printf("%s: Providing AWS keys via argument is deprecated, please use environment variables\n", awsConfig.PluginConfig.Name)
+	}
 
 	if len(awsConfig.AwsInstanceID) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
