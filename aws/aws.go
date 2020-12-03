@@ -3,9 +3,11 @@ package aws
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/sensu-community/sensu-plugin-sdk/sensu"
@@ -24,6 +26,7 @@ type Config struct {
 	AwsInstanceID         string
 	AllowedInstanceStates string
 	Timeout               uint64
+	AssumeRoleArn         string
 
 	// Computed from the input
 	AwsAccountsMap           map[string]bool
@@ -53,19 +56,33 @@ func NewHandler(config *Config) (*Handler, error) {
 
 func (awsHandler *Handler) initAws() error {
 	log.Println("Creating AWS session...")
-	var err error
-	creds := credentials.NewStaticCredentials(awsHandler.config.AwsAccessKeyID, awsHandler.config.AwsSecretKey, "")
 
-	awsHandler.awsSession, err = session.NewSession(&aws.Config{
-		Region:      aws.String(awsHandler.config.AwsRegion),
-		Credentials: creds,
-	})
-	if err != nil {
-		return err
+	// to prevent a breaking change of supplying the AWS Creds/Region via
+	// arguments, but not in the env, push them back to the env to be picked
+	// up by the session
+	if len(awsHandler.config.AwsAccessKeyID) > 0 {
+		os.Setenv("AWS_ACCESS_KEY_ID", awsHandler.config.AwsAccessKeyID)
 	}
+	if len(awsHandler.config.AwsSecretKey) > 0 {
+		os.Setenv("AWS_SECRET_KEY", awsHandler.config.AwsSecretKey)
+	}
+	if len(awsHandler.config.AwsRegion) > 0 {
+		os.Setenv("AWS_REGION", awsHandler.config.AwsRegion)
+	}
+
+	awsHandler.awsSession = session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
 	log.Println("Session created!")
 
-	awsHandler.ec2Service = ec2.New(awsHandler.awsSession)
+	if arn.IsARN(awsHandler.config.AssumeRoleArn) {
+		log.Println("Using Role ARN")
+		creds := stscreds.NewCredentials(awsHandler.awsSession, awsHandler.config.AssumeRoleArn)
+		awsHandler.ec2Service = ec2.New(awsHandler.awsSession, &aws.Config{Credentials: creds})
+	} else {
+		awsHandler.ec2Service = ec2.New(awsHandler.awsSession)
+	}
 
 	return nil
 }

@@ -7,8 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
+	"os"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/sensu-community/sensu-plugin-sdk/httpclient"
 	"github.com/sensu-community/sensu-plugin-sdk/sensu"
 	"github.com/sensu/sensu-ec2-handler/aws"
@@ -43,7 +45,7 @@ var (
 			Shorthand: "k",
 			Default:   "",
 			Secret:    true,
-			Usage:     "The AWS access key id to authenticate",
+			Usage:     "The AWS access key id to authenticate (deprecated, use env variable instead)",
 			Value:     &awsConfig.AwsAccessKeyID,
 		},
 		{
@@ -53,7 +55,7 @@ var (
 			Shorthand: "s",
 			Default:   "",
 			Secret:    true,
-			Usage:     "The AWS secret key id to authenticate",
+			Usage:     "The AWS secret key id to authenticate (deprecated, use env variable instead)",
 			Value:     &awsConfig.AwsSecretKey,
 		},
 		{
@@ -127,6 +129,14 @@ var (
 			Usage:     "The Sensu Go CA Certificate",
 			Value:     &sensuCACert,
 		},
+		{
+			Path:      "aws-assume-role-arn",
+			Env:       "AWS_ASSUME_ROLE_ARN",
+			Argument:  "aws-assume-role-arn",
+			Shorthand: "R",
+			Usage:     "The AWS IAM Role to assume",
+			Value:     &awsConfig.AssumeRoleArn,
+		},
 	}
 
 	validInstanceStates = map[string]bool{
@@ -149,17 +159,14 @@ func main() {
 func checkArgs(event *corev2.Event) error {
 	retrieveAwsInstanceID(event)
 
-	if len(awsConfig.AwsAccessKeyID) == 0 {
-		return fmt.Errorf("aws-access-key-id must contain a value")
+	// Check for deprecated use of command line specification of keys
+	if (len(awsConfig.AwsAccessKeyID) > 0 && len(os.Getenv("AWS_ACCESS_KEY_ID")) == 0) ||
+		(len(awsConfig.AwsSecretKey) > 0 && len(os.Getenv("AWS_SECRET_KEY")) == 0) {
+		log.Printf("%s: Providing AWS keys via argument is deprecated, please use environment variables\n", awsConfig.PluginConfig.Name)
 	}
-	if len(awsConfig.AwsSecretKey) == 0 {
-		return fmt.Errorf("aws-secret-key must contain a value")
-	}
+
 	if len(awsConfig.AwsInstanceID) == 0 {
 		return fmt.Errorf("aws-instance-id must contain a value")
-	}
-	if len(awsConfig.AwsRegion) == 0 {
-		return fmt.Errorf("aws-region must contain a value")
 	}
 	if len(awsConfig.AllowedInstanceStates) == 0 {
 		return fmt.Errorf("allowed-instance-states must contain at least one value")
@@ -173,6 +180,11 @@ func checkArgs(event *corev2.Event) error {
 	}
 	if len(sensuAPIKey) == 0 {
 		return fmt.Errorf("sensu-api-key must contain a value")
+	}
+	if len(awsConfig.AssumeRoleArn) > 0 {
+		if !arn.IsARN(awsConfig.AssumeRoleArn) {
+			return fmt.Errorf("aws-assume-role-arn %s is not a valid ARN", awsConfig.AssumeRoleArn)
+		}
 	}
 
 	// parse the instance states
