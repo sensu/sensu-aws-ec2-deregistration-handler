@@ -7,7 +7,7 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-## [0.3.0] - 2020-12-03
+## [0.4.0] - 2020-12-03
 
 ### Breaking change
 - Changed annotation keyspace from "sensu.io/plugins/ec2deregistration/config"to
